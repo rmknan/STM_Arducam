@@ -108,36 +108,46 @@ int main(void)
 	  HAL_UART_Transmit(&huart1, (uint8_t*)"Error\r\n", 14, 100);
   }
 
-  //Variable to store picture
-  uint8_t tempBuffer[255];
+
+//  uint8_t tempBuffer[255];
+  uint32_t Starttime = HAL_GetTick();
+
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
+  while (HAL_GetTick() - Starttime < 2000)
   {
     /* USER CODE END WHILE */
 	  takePicture(&myCamera, CAM_IMAGE_MODE_QVGA, CAM_IMAGE_PIX_FMT_JPG);
 
 	  char headerMsg[30];
-	  int len = sprintf(headerMsg, "SIZE:%u\r\n")
+	  int len = sprintf(headerMsg, "SIZE:%u\r\n",myCamera.totalLength);
 
-	  HAL_UART_Transmit(&huart1, (uint8_t*)"Capture Started \n \r", 20, 100);
+	  HAL_UART_Transmit(&huart1, (uint8_t*)headerMsg, len, 100);
 
 	  while (myCamera.receivedLength > 0)
 	  {
+		  //Variable to store picture
+		  uint8_t tempBuffer[255];
+
 		  uint8_t bytesRead = readBuff(&myCamera, tempBuffer, 255);
 
 		  HAL_UART_Transmit(&huart1, tempBuffer, bytesRead, 100);
 	  }
 
-	  HAL_UART_Transmit(&huart1, (uint8_t*)"Capture ended \n \r", 20, 100);
-	  HAL_Delay(5000);
+	  HAL_Delay(100);
 
 
     /* USER CODE BEGIN 3 */
   }
+  HAL_UART_Transmit(&huart1, (uint8_t*)"Capture ended \n \r", 20, 100);
+  HAL_Delay(5000);
+  while(1)
+ 	  {
+
+ 	  }
   /* USER CODE END 3 */
 }
 
